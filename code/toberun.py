@@ -14,11 +14,11 @@ import torch.nn.functional as F
 from torch_geometric.nn import GATConv # [^1^][1]
 
 # Load the dta datasets into a pandas dataframe
-df2006 = pd.read_stata(rf"data\brazilian_municipalities2006.dta")
-df2010 = pd.read_stata(rf"data\brazilian_municipalities2010.dta")
-df2014 = pd.read_stata(rf"data\brazilian_municipalities2014.dta")
-df2018 = pd.read_stata(rf"data\brazilian_municipalities2018.dta")
-df2022 = pd.read_stata(rf"data\brazilian_municipalities2022.dta")
+df2006 = pd.read_stata(rf"data/brazilian_municipalities2006.dta")
+df2010 = pd.read_stata(rf"data/brazilian_municipalities2010.dta")
+df2014 = pd.read_stata(rf"data/brazilian_municipalities2014.dta")
+df2018 = pd.read_stata(rf"data/brazilian_municipalities2018.dta")
+df2022 = pd.read_stata(rf"data/brazilian_municipalities2022.dta")
 
 # %%
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -288,7 +288,7 @@ def test_testset(year):
       plt.hist(shuffled.cpu() - data.y[mask].cpu().float(), alpha=0.5, label='Shuffled')
       plt.legend(loc='upper right')
       #save plot
-      plt.savefig(rf"outputs\performance.pdf")
+      plt.savefig(rf"outputs/performance.pdf")
       return test_acc, pred, mse, bias, r2, out
 
 #test on the training data
