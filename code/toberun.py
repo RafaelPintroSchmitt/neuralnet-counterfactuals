@@ -1,6 +1,3 @@
-import os
-os.chdir(r"C:\Users\rafap\Desktop\RA2023 - personal files\neuralnet-counterfactuals")
-
 import pandas as pd
 import numpy as np
 import torch
