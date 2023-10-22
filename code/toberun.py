@@ -67,7 +67,7 @@ for df in [df2010, df2014, df2018, df2022]:
     Y = pd.qcut(Y["diff"], q=100, labels=False)
     Y = Y.to_numpy()
 
-    X = df.loc[:, ["diff", "l4pt_share", "populacao", "evangelico", "urban", "radio", "televisao", "idade", "alfabetizado", "rend_total", "area", "density", "white", "nasceu_mun", "horas_trabprin", "filhos_nasc_vivos", "high_school", "bachelor", "vive_conjuge", "sexo", "high"]]
+    X = df.loc[:, ["diff", "populacao", "evangelico", "urban", "radio", "televisao", "idade", "alfabetizado", "rend_total", "area", "density", "white", "nasceu_mun", "horas_trabprin", "filhos_nasc_vivos", "high_school", "bachelor", "vive_conjuge", "sexo", "high"]]
     #save the collumn high in a pd series
     high = X["high"]
     #normalize the data
