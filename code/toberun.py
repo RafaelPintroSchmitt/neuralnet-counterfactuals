@@ -1,17 +1,6 @@
-# %% [markdown]
-# # Electoral geography: predicting the universe of city-level vote-shares with a sample of cities
+import os
+os.chdir(r"C:\Users\rafap\Desktop\RA2023 - personal files\neuralnet-counterfactuals")
 
-# %% [markdown]
-# Outline: the objectives of this exercise are:
-# 
-# (1) to predict changes in the vote-share of the workers party in Brazil (PT) for every municipality in Brazil, using only a subset of such municipalities. I will train a Graph Neural Network to make predictions.
-# 
-# (2) given some treatment affecting a subset of municipalities (treated), use the model to predict changes in the vote-share of the treated group using only the control group (non-treated). I will train the model in the years before treatment, and I will use the model to predict the counterfactual outcome of the treated using the control group, before and after treatment. The model bias will be estimated as the difference between the predicted and the actual outcome of the treated group. If the model is roughly unbiased before treatment, then the difference between the predicted and the actual outcome of the treated group after treatment will be a measure of the average treatment effect (ATE = -bias).
-
-# %% [markdown]
-# First, import the necessary libraries and load the data.
-
-# %%
 import pandas as pd
 import numpy as np
 import torch
@@ -26,17 +15,18 @@ from torch_geometric.nn import GCNConv
 from sklearn.manifold import TSNE
 import torch.nn.functional as F
 from torch_geometric.nn import GATConv # [^1^][1]
-import os
-
-# Set directory to then use as path
-path = r"C:\Users\rafap\Desktop\RA2023 - personal files\neuralnet-counterfactuals"
 
 # Load the dta datasets into a pandas dataframe
-df2006 = pd.read_stata(rf"{path}\data\brazilian_municipalities2006.dta")
-df2010 = pd.read_stata(rf"{path}\data\brazilian_municipalities2010.dta")
-df2014 = pd.read_stata(rf"{path}\data\brazilian_municipalities2014.dta")
-df2018 = pd.read_stata(rf"{path}\data\brazilian_municipalities2018.dta")
-df2022 = pd.read_stata(rf"{path}\data\brazilian_municipalities2022.dta")
+df2006 = pd.read_stata(rf"data\brazilian_municipalities2006.dta")
+df2010 = pd.read_stata(rf"data\brazilian_municipalities2010.dta")
+df2014 = pd.read_stata(rf"data\brazilian_municipalities2014.dta")
+df2018 = pd.read_stata(rf"data\brazilian_municipalities2018.dta")
+df2022 = pd.read_stata(rf"data\brazilian_municipalities2022.dta")
+
+# %%
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device
+device_cpu = torch.device('cpu')
 
 # %% [markdown]
 # Now, I create a list containing the graphs of each election. Each graph is a tensor_geometric Data object, which contains the adjacency matrix and the features of each node. The graph structure is defined by linking each city to it's 10 closest peers (in terms of geographical distance).
@@ -61,13 +51,13 @@ for df in [df2010, df2014, df2018, df2022]:
     df = df[~np.isnan(df).any(axis=1)]
 
     #create difference from previous election to current election
-    df["diff"] = df.loc[:, "pt_share"] - df.loc[:, "l4pt_share"]
+    df["diff"] = df["pt_share"] - df["l4pt_share"]
     Y = df.loc[:, ["diff"]]
     #divide Y in 100 quantiles
     Y = pd.qcut(Y["diff"], q=100, labels=False)
     Y = Y.to_numpy()
 
-    X = df.loc[:, ["diff", "populacao", "evangelico", "urban", "radio", "televisao", "idade", "alfabetizado", "rend_total", "area", "density", "white", "nasceu_mun", "horas_trabprin", "filhos_nasc_vivos", "high_school", "bachelor", "vive_conjuge", "sexo", "high"]]
+    X = df.loc[:, ["diff", "l4pt_share", "populacao", "evangelico", "urban", "radio", "televisao", "idade", "alfabetizado", "rend_total", "area", "density", "white", "nasceu_mun", "horas_trabprin", "filhos_nasc_vivos", "high_school", "bachelor", "vive_conjuge", "sexo", "high"]]
     #save the collumn high in a pd series
     high = X["high"]
     #normalize the data
@@ -78,34 +68,34 @@ for df in [df2010, df2014, df2018, df2022]:
     # Create treat, which is a copy of df with the values of diff set to 0 if high (my treatment variable) is 1
     # This is to evaluate the effect of treatment in 2022
     treat = X.copy().to_numpy()
-    treat[:, 0] = treat[:, 0] * (1 - treat[:, 19])
+    treat[:, 0] = treat[:, 0] * (1 - treat[:, 20])
     #drop collumn high from treat
     treat = treat[:, :-1]
     # Create a tensor for treat
-    treat = torch.tensor(treat, dtype=torch.float)
+    treat = torch.tensor(treat, dtype=torch.float).to(device)
     # Create a boolean taking values 1 if treat is 0 and 1 otherwise (use sourceTensor.clone().detach())
     treat_mask = treat[:, 0].clone().detach()
     treat_mask[treat_mask != 0] = 1
-    treat_mask = torch.logical_not(treat_mask)
+    treat_mask = torch.logical_not(treat_mask).to(device)
     treatment_list.append(treat)
     treatment_mask.append(treat_mask)
 
     #drop the collumn high
     X = X.drop(columns=["high"])
-    
+
     # Create Z, which is a copy of X with a random 50% of the values in diff set to 0
     # This is for testing the model at the end
     Z = X.copy().to_numpy()
     Z[:, 0] = np.random.choice([0, 1], size=Z.shape[0], p=[0.5, 0.5]) * Z[:, 0]
-    # Create a tensor for Z 
-    Z = torch.tensor(Z, dtype=torch.float)
+    # Create a tensor for Z
+    Z = torch.tensor(Z, dtype=torch.float).to(device)
     # Create a boolean taking values 1 if Z is 0 and 1 otherwise (use sourceTensor.clone().detach())
     Z_mask = Z[:, 0].clone().detach()
     Z_mask[Z_mask != 0] = 1
-    Z_mask = torch.logical_not(Z_mask)
+    Z_mask = torch.logical_not(Z_mask).to(device)
     Z_list.append(Z)
     Zmask_list.append(Z_mask)
-    
+
     # Extract the coordinates as a numpy array
     coords = df[["_Y0", "_X0"]].to_numpy()
 
@@ -156,8 +146,12 @@ for df in [df2010, df2014, df2018, df2022]:
     #define out_features as the number of quantiles in Y, as a function of Y
     out_features = len(np.unique(Y))
 
+    #put in gpu
+    data.to(device)
+
     #append to data_list
     data_list.append(data)
+
 
 # %% [markdown]
 # To test whether the predictions also generalize across years, I take 2022 (and possibly 2018) away from the training set. I'll then apply the model to 2022 and check the performance.
@@ -202,14 +196,14 @@ class GAT(nn.Module):
         return x
 
 model = GAT()
+model = model.to(device)
 
 # %% [markdown]
 # The training of the model is simple: for every epoch I actually take one optimization step for each election included in the training. By alternating the elections at every training step (instead of training on each election sequentially), I hope to capture a more robust relationship underlying electoral geographical distributions. Note that I start by dropping 90% of the nodes in the dropout layer, going down to 50% as the training progresses.
 
 # %%
-model = GAT()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
-criterion = torch.nn.CrossEntropyLoss()
+criterion = torch.nn.CrossEntropyLoss().to(device)
 
 def train():
     #loop over items of datalist
@@ -226,11 +220,12 @@ def train():
 for epoch in range(1, 100):
     drops = 0.9
     loss = train()
+    print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}')
 
 # %% [markdown]
 # Testing is defined as follows. There are 3 functions. The main one (test(year)), is used to test the model's predictions for the treatment groups defined above. Unexpected biases in the predictions of the model are interpreted as the effect of treatment (since we are comparing with the models "counterfactual" predictions).
 # 
-# The other two are simple test functions, which evaluate the models capabilities to predict vote-shares of a sample of randomly selected cities given the remaining ones' vote-shares in 2022. More precisely: Z is defined above by taking data2022 and setting half of the values of diff to 0. Z_mask is a boolean vector taking value 1 if diff was set to 0 in a particular observation. Here, I evaluate the models ability to predict diff for those cities that had their diff set to 0. 
+# The other two are simple test functions, which evaluate the models capabilities to predict vote-shares of a sample of randomly selected cities given the remaining ones' vote-shares in 2022. More precisely: Z is defined above by taking data2022 and setting half of the values of diff to 0. Z_mask is a boolean vector taking value 1 if diff was set to 0 in a particular observation. Here, I evaluate the models ability to predict diff for those cities that had their diff set to 0.
 # 
 # test_testset() evaluates the model's fit for the test set, whereas test_trainset() evaluates the model's fit for the training set (the latter is mainly to diagnose overfitting in case the accuracy in the training set is much larger than in the test set.)
 
@@ -259,6 +254,11 @@ def test(year):
       mse_shuffled = torch.mean((shuffled - data.y[mask].float())**2)
       #fake rsquared
       r2 = 1 - mse/mse_shuffled
+      #plot the two histograms together, with transparency and different colors
+      plt.hist(pred[mask].cpu().float() - data.y[mask].cpu().float(), alpha=0.5, label='Predictions')
+      plt.hist(shuffled.cpu() - data.y[mask].cpu().float(), alpha=0.5, label='Shuffled')
+      plt.legend(loc='upper right')
+      plt.show()
       return test_acc, pred, mse, bias, r2, out
 
 #Test on the test data
@@ -285,4 +285,23 @@ def test_testset(year):
       mse_shuffled = torch.mean((shuffled - data.y[mask].float())**2)
       #fake rsquared
       r2 = 1 - mse/mse_shuffled
+
+      #plot the two histograms together, with transparency and different colors
+      plt.hist(pred[mask].cpu().float() - data.y[mask].cpu().float(), alpha=0.5, label='Predictions')
+      plt.hist(shuffled.cpu() - data.y[mask].cpu().float(), alpha=0.5, label='Shuffled')
+      plt.legend(loc='upper right')
+      #save plot
+      plt.savefig(rf"outputs\performance.pdf")
       return test_acc, pred, mse, bias, r2, out
+
+#test on the training data
+def test_trainset():
+        model.eval()
+        data = data2022
+        out = model(Z, data.edge_index, data.edge_attr)
+        pred = out.argmax(dim=1)  # Use the class with highest probability.
+        mask = Z_mask*data.train_mask #add *data.train_mask if data2022 in the training set
+        test_correct = pred[mask] == data.y[mask]  # Check against ground-truth labels.
+        test_acc = int(test_correct.sum()) / int(mask.sum())  # Derive ratio of correct predictions.
+        return test_acc
+
