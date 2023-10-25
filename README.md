@@ -64,14 +64,14 @@ Summarizing:
 ### Performance
 The model performs reasonably well. Be reminded that the outcome of interest is the percentile of the difference in worker's party vote share for each year. Also, let us define $R^2_{GAT} = 1 - \frac{MSE_M}{MSE_R}$, where $MSE_M$ is the mean-squared error of the model - in terms of percentile predicted - and $MSE_R$ is the mean-squared error under random guesses. 
 
-I trained the model, 300 forward passes and optimization steps, a hundred times, obtaining different parametrizations for each[^6^]. The testing is simple: I take the set of cities in the test set, which were not used in training, select half at random and make their outcome variable equal to zero. Then, I input the resulting dataset into the model and evaluate it on its ability to guess the dropped cities' outcomes correctly.
+I trained the model, 300 forward passes and optimization steps, a hundred times, obtaining different parametrizations for each. The testing is simple: I take the set of cities in the test set, which were not used in training, select half at random and make their outcome variable equal to zero. Then, I input the resulting dataset into the model and evaluate it on its ability to guess the dropped cities' outcomes correctly.
 
 On average, $R^2_{GAT}\approx 0.8$ in the training set, and its accuracy - getting the percentile exactly right - is 2 to 3 times higher than random guesses. The performance on training and test sets is similar, which indicates overfitting is likely not an issue, and the model is on average unbiased from 2010 to 2018. I will come back to this last point.
 
 ### Treatment Effect Evaluation
 We can finally turn to the evaluation of treatment effects using the neural network's prediction as counterfactuals. Be reminded that I define as "treated" those cities with wind-death covariance above the median in their state.
 
-For the years 2010 through 2022, I omit the outcomes of the treated cities and feed the data into the network. I get predictions for each treated city which are based only on the control cities (and covariates of the treated cities). For each year, I record the bias of the predictions (average error across cities) and repeat the training and evaluation 100 times[^7^]. I perform the same exercise randomly selecting "treatment" units at every training procedure and year, as a placebo test.
+For the years 2010 through 2022, I omit the outcomes of the treated cities and feed the data into the network. I get predictions for each treated city which are based only on the control cities (and covariates of the treated cities). For each year, I record the bias of the predictions (average error across cities) and repeat the training and evaluation 100 times. I perform the same exercise randomly selecting "treatment" units at every training procedure and year, as a placebo test.
 
 The results are plotted in the following picture:
 
@@ -79,7 +79,7 @@ The results are plotted in the following picture:
 
 The model is roughly unbiased before treatment for the treated, and unbiased before and after treatment for the placebo. That is, it creates fairly good counterfactuals for the treated group before treatment. Using the notation introduced at the beginning of the section, the neural networks' predictions are a good candidate for a sequence $\{P_{i,t}^N\}$ of mean-unbiased predictors or proxies for $Y^N_{i,t}$.
 
-The bias is positive for 2022. This means that the predictions of the model - our counterfactual - overshot the worker's party vote share in treated cities[^8^]. From \eqref{eq:potential}, we get that $\theta_{2022}$, the treatment effect, should be negative. Knowing that WDT negatively impacted excess mortality in 2021, we can revert back to the IV reasoning of previous sections to argue that excess mortality caused a decrease in Bolsonaro's vote share. Note, however, that I tackled the issue of selection of cities into treatment[^9^], particularly when using WDT instead of NWDT, by constructing a credible counterfactual.
+The bias is positive for 2022. This means that the predictions of the model - our counterfactual - overshot the worker's party vote share in treated cities. From the potential outcomes equations, we get that $\theta_{2022}$, the treatment effect, should be negative. Knowing that WDT negatively impacted excess mortality in 2021, we can revert back to the IV reasoning of previous sections to argue that excess mortality caused a decrease in Bolsonaro's vote share. Note, however, that I tackled the issue of selection of cities into treatment, particularly when using WDT instead of NWDT, by constructing a credible counterfactual.
 
 From the error bars for the placebo, we can see that, across the training procedures, a random selection of cities into treatment would generate results as extreme as the ones observed for the treatment group less than 5% of the time.
 
