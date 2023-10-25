@@ -24,10 +24,10 @@ Following the potential outcomes framework of [Neyman (1923)](#) and [Rubin (197
 
 Finally, let $\{P_{i,t}^N\}$ be a sequence of mean-unbiased predictors or proxies for $Y^N_{i,t}$, such that $Y^N_{i,t} = P_{i,t}^N + u_t$, where $E(u_t)=0$ $\forall$ $t \in \{1,...,T\}$. The potential outcomes can thus be written as:
 
-```latex
+$$
 Y^N_{i,t} = P_{i,t}^N + u_t
 Y^I_{i,t} = P_{i,t}^N + \theta_t + u_t
-```
+$$
 
 Under suitable assumptions, having $P_{i,t}^N$ allows us to test hypotheses on $\theta_t$. One such hypothesis, which we want to reject, is whether $\theta_t=0$ $\forall$ $t\geq T_0$. That is, whether we have evidence that the intervention had some effect.
 
