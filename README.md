@@ -75,7 +75,7 @@ For the years 2010 through 2022, I omit the outcomes of the treated cities and f
 
 The results are plotted in the following picture:
 
-![plot]([./blob/main/outputs/2010_2018.jpg])
+![plot]([./outputs/2010_2018.jpg])
 
 The model is roughly unbiased before treatment for the treated, and unbiased before and after treatment for the placebo. That is, it creates fairly good counterfactuals for the treated group before treatment. Using the notation introduced at the beginning of the section, the neural networks' predictions are a good candidate for a sequence $\{P_{i,t}^N\}$ of mean-unbiased predictors or proxies for $Y^N_{i,t}$.
 
