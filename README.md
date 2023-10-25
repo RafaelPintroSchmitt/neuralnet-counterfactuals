@@ -75,7 +75,9 @@ For the years 2010 through 2022, I omit the outcomes of the treated cities and f
 
 The results are plotted in the following picture:
 
+<div align="center">
 <center><img src="./outputs/2010_2018.jpg" width="500"/></center>
+</div>
 
 The model is roughly unbiased before treatment for the treated, and unbiased before and after treatment for the placebo. That is, it creates fairly good counterfactuals for the treated group before treatment. Using the notation introduced at the beginning of the section, the neural networks' predictions are a good candidate for a sequence $\{P_{i,t}^N\}$ of mean-unbiased predictors or proxies for $Y^N_{i,t}$.
 
@@ -90,5 +92,5 @@ Taking the placebo in conjunction with the permutations test, it is unlikely tha
 One may argue that there should be a validation period of the model before treatment. That is, that training should be conducted only in 2010 and 2014, so we can test whether differentials appear already in 2018 or only in 2022. However, note that the training was conducted in one subset of cities for each year, and the figure refers to applying the model to another subset. No city-year was used in both training and results. Also, there does not seem to be an issue for the model to perform well in 2022 when considering placebo treatments. Nonetheless, I present the results derived from training the network only on data from 2010 and 2014. The main patterns do not change.
 
 <div align="center">
-<center><img src="./outputs/2010_2018.jpg" width="500"/></center>
+<center><img src="./outputs/2010_2014.jpg" width="500"/></center>
 </div>
