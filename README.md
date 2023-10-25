@@ -7,7 +7,6 @@ In order to run this code, I suggest opening the jupyter notebook on Google Cola
 Feel free to contact me for any suggestions or questions.
 Sure, here's a raw Markdown format for a README file based on the provided text. You can paste this into your GitHub repository:
 
-```markdown
 # Graph Neural Network Counterfactuals
 
 ## Table of Contents
