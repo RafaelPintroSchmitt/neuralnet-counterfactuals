@@ -18,7 +18,7 @@ Sure, here's a raw Markdown format for a README file based on the provided text.
 - [Treatment Effect Evaluation](#treatment-effect-evaluation)
 
 ## Introduction
-In this section, I propose a method to evaluate treatment effects based on a neural network's (lack of) accuracy post-treatment. This comes down to recasting causal inference as a prediction problem. I refer to [chernozhukovExactRobustConformal2021](#) for a summary of the related literature and a general framework that includes the method presented here. My discussion will be inspired by their conformal inference test[^1^]. 
+In this section, I propose a method to evaluate treatment effects based on a neural network's (lack of) accuracy post-treatment. This comes down to recasting causal inference as a prediction problem. I refer to [Chernozhukov et al, 2021](https://doi.org/10.1080/01621459.2021.1920957), for a summary of the related literature and a general framework that includes the method presented here. My discussion will be inspired by their conformal inference test[^1^]. 
 
 ### Potential Outcomes Framework
 Following the potential outcomes framework of [Neyman](#) and [Rubin](#), and borrowing the notation from [chernozhukovExactRobustConformal2021](#), let $t\in \{1,2,...,T\}$ be a generic time period in a sequence of length $T$. I consider $\{Y^I_{i,t}\}_{t=1}^T$ to be a sequence of outcomes for a unit of observation $i$ followed over time, under some intervention at time $T_0$. Let $\theta_t$ be a scalar capturing the effect of the intervention, with $\theta_t = 0$ for $t<T_0$. $\{Y^N_{i,t}\}_{t=1}^T$ denotes $Y^I_{i,t} - $\theta_t$ for each $t$, that is, it represents a counterfactual world where the intervention did not take place. 
