@@ -15,7 +15,7 @@ In this section, I propose a method to evaluate treatment effects based on a neu
 - Let $t\in \{1,2,...,T\}$ be a generic time period in a sequence of length $T$.
 - Consider $\{Y^I_{i,t}\}_{t=1}^T$ as a sequence of outcomes for a unit of observation $i$ followed over time, under some intervention at time $T_0$.
 - Let $\theta_t$ be a scalar capturing the effect of the intervention, with $\theta_t = 0$ for $t < T_0 $.
-- ${Y^N_{i,t}}_{t=1}^T$ denotes $Y^I_{i,t} - \theta_t$ for each $t$, representing a counterfactual world where the intervention did not take place.
+- $ \{ Y^N_{i,t}\}^T$ denotes $Y^I_{i,t} - \theta_t$ for each $t$, representing a counterfactual world where the intervention did not take place.
 - $\{P_{i,t}^N\}$ be a sequence of mean-unbiased predictors or proxies for $Y^N_{i,t}$, such that $Y^N_{i,t} = P_{i,t}^N + u_t$, where $E(u_t)=0$ $\forall$ $t \in $\{1,...,T\}.
 
 Under suitable assumptions, having $P_{i,t}^N$ allows us to test hypotheses on $\theta_t$. One such hypothesis is whether $\theta_t=0$ $\forall$ $t\geq T_0.
