@@ -37,18 +37,18 @@ Under suitable assumptions, having $P_{i,t}^N$ allows us to test hypotheses on $
 There are many ways to try and obtain $P_{i,t}^N$. One such method is using synthetic controls, in which the counterfactual of some unit is constructed by taking a linear combination of other units, with the goal of mimicking the behavior of the dependent variable of interest as well as possible. If such a method is able to extrapolate from the training sample, i.e. to predict accurately the dependent variable for $t$ outside the time periods used for training, then it provides a good candidate for $P_{i,t}^N$ . Indeed, we can fit the model before an intervention, and use the predictions of the model as counterfactuals after it. My contribution will be to provide a method to create such counterfactuals (i.e. to get a plausible sequence $P_{i,t}^N$, using a graph neural network architecture.
 
 ## Back to the Topic
-You can find more information on the attached paper, but the main issue I encountered when trying to use (non-net) wind-death timing as a treatment, was that cities selected into treatment - i.e. $\text{WDT}_{2021}$ - presented differential trends in prior elections. Let us consider, for the purposes of this section, that cities with WDT above the median in their state are "treated," and assign them to "control" otherwise. How can we get an appropriate counterfactual if the treated and control groups are substantially different and their voting patterns do not evolve in parallel?
+You can find more information on the attached paper, but the main issue I encountered when trying to use (non-net) wind-death timing as a treatment/instrument, was that cities selected into treatment - i.e. $\text{WDT}_{2021}$ - presented differential trends in prior elections. Let us consider, for the purposes of this section, that cities with WDT above the median in their state are "treated," and assign them to "control" otherwise. How can we get an appropriate counterfactual if the treated and control groups are substantially different and their voting patterns do not evolve in parallel?
 
 The two groups still carry information about each other. Traditionally, one would perform some kind of matching (e.g. using propensity scores), so that treated and control units are paired according to some underlying measure of similarity. Though at its core my approach does match treated and (a function of the) control units, I try to tackle the issue as a prediction problem: using only the control units, I attempt to construct a model that approximates the treated units' outcomes as well as possible.
 
-To do so, I use a graph attention network (GAT). Explaining GATs from scratch is outside the scope of this project, but I will try to provide some intuition as I go. The technicalities of the machine learning algorithm are not necessary to understand the application presented here[^2^][^3^].
+To do so, I use a graph attention network (GAT). Explaining GATs from scratch is outside the scope of this project, but I will try to provide some intuition as I go. The technicalities of the machine learning algorithm are not necessary to understand the application presented here.
 
 ### Defining the Neural Network
-The first step is setting up the data structure which will be fed into the model. I construct a graph - also called a network - for each year. Each city is connected to its 10 closest neighbors in terms of geographical distance, which is itself used as an edge attribute (a weight used by the neural network). I include the covariates listed in appendix \eqref{sec:appendix05} as node attributes, together with the year-percentile of the difference in PT vote-share relative to the previous election, which is the outcome of interest[^4^].
+The first step is setting up the data structure which will be fed into the model. I construct a graph - also called a network - for each year. Each city is connected to its 10 closest neighbors in terms of geographical distance, which is itself used as an edge attribute (a weight used by the neural network). I include the covariates listed in the paper as node attributes, together with the year-percentile of the difference in PT vote-share relative to the previous election, which is the outcome of interest.
 
 The objective of the model is simple: given a sample of Brazilian cities' changes in PT vote share, it should predict the outcome for all other cities. If it learns to do so, we can hope that by inputting the control cities' information, the model will be able to predict the treated cities' outcomes. Note that the model learns a generic instruction: given any set of cities, predict the rest. But by learning to do so, it becomes well-suited for our objective, which is creating a counterfactual for the treated group. I split the sample into training and test sets. The model's parameters are obtained from one set of cities, and my results are derived by applying the model to a different set.
 
-Now I can explain the neural network's architecture - i.e. how it learns. I start with an overview for the reader unfamiliar with neural networks and then go into the specifics. At the first epoch (or training round), I feed the model with the 2010 network. Each layer of the network is basically a set of instructions to receive, transform and transmit the vector/matrix received from the previous layer. Then, the model applies an optimizer step, more precisely a variant of gradient descent called Adam[^5^]. 
+Now I can explain the neural network's architecture - i.e. how it learns. I start with an overview for the reader unfamiliar with neural networks and then go into the specifics. At the first epoch (or training round), I feed the model with the 2010 network. Each layer of the network is basically a set of instructions to receive, transform and transmit the vector/matrix received from the previous layer. Then, the model applies an optimizer step, more precisely a variant of gradient descent called Adam. 
 
 Summarizing:
 
@@ -58,9 +58,7 @@ Summarizing:
     3. A linear layer.
 
 - Training:
-    1. Perform a forward pass and take
-
- an optimizer step for each year in the training data (2010-2018).
+    1. Perform a forward pass and take an optimizer step for each year in the training data (2010-2018).
     2. 100 training rounds for each year - 300 forward passes and optimization steps.
 
 ### Performance
