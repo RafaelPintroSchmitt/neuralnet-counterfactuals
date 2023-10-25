@@ -26,6 +26,8 @@ Finally, let $\{P_{i,t}^N\}$ be a sequence of mean-unbiased predictors or proxie
 
 $$
 Y^N_{i,t} = P_{i,t}^N + u_t
+$$
+$$
 Y^I_{i,t} = P_{i,t}^N + \theta_t + u_t
 $$
 
