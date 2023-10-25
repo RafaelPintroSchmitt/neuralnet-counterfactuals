@@ -94,9 +94,3 @@ One may argue that there should be a validation period of the model before treat
 <div align="center">
 <center><img src="./outputs/2010_2014.jpg" width="500"/></center>
 </div>
-<<<<<<< HEAD
-
-Finally, note that this is also an exercise in model selection: given the architecture, the results here are an average of many parametrizations stemming from different random seeds.
-As such, I provide evidence for the robustness of my results with respect to control group selection and counterfactual generation procedures.
-=======
->>>>>>> 5f520371bfa16955d735addc91ab78199bd6ab91
