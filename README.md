@@ -83,13 +83,10 @@ The bias is positive for 2022. This means that the predictions of the model - ou
 
 From the error bars for the placebo, we can see that, across the training procedures, a random selection of cities into treatment would generate results as extreme as the ones observed for the treatment group less than 5% of the time.
 
-Furthermore, in the spirit of the conformal test proposed by [chernozhukovExactRobustConformal2021](#), I provide some back-of-the-envelope calculations on how likely it would be to find results as extreme as the ones presented here if there were no effect to be found. Let $\{0,0,0,1\}$ represent the current result, indicating that I do not find effects for the first three years and do find an effect for the fourth. This configuration has a 25% chance of occurring under the set of all permutations of the observed results, which can be interpreted as a sort of p-value.
+Furthermore, in the spirit of the conformal test proposed by [Chernozhukov et al (2021)](https://doi.org/10.1080/01621459.2021.1920957), I provide some back-of-the-envelope calculations on how likely it would be to find results as extreme as the ones presented here if there were no effect to be found. Let \{0,0,0,1\} represent the current result, indicating that I do not find effects for the first three years and do find an effect for the fourth. This configuration has a 25% chance of occurring under the set of all permutations of the observed results, which can be interpreted as a sort of p-value.
 
 Taking the placebo in conjunction with the permutations test, it is unlikely that the results here do not reflect a treated-group-specific effect in 2022. However, the same caveat from before applies: it could be that the treated group is different from the control across some dimension that moderates the pandemic's impact on the elections, and the neural network did not have the opportunity to learn this pattern.
 
 One may argue that there should be a validation period of the model before treatment. That is, that training should be conducted only in 2010 and 2014, so we can test whether differentials appear already in 2018 or only in 2022. However, note that the training was conducted in one subset of cities for each year, and the figure refers to applying the model to another subset. No city-year was used in both training and results. Also, there does not seem to be an issue for the model to perform well in 2022 when considering placebo treatments. Nonetheless, I present the results derived from training the network only on data from 2010 and 2014. The main patterns do not change.
 
 [Insert Image]
-```
-
-Please note that I've used placeholders like `[chernozhukovExactRobustConformal2021](#)` for the cited references and `[Insert Image]` for image placeholders. You should replace these with the actual links or content when you create your GitHub README.
