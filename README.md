@@ -89,4 +89,4 @@ Taking the placebo in conjunction with the permutations test, it is unlikely tha
 
 One may argue that there should be a validation period of the model before treatment. That is, that training should be conducted only in 2010 and 2014, so we can test whether differentials appear already in 2018 or only in 2022. However, note that the training was conducted in one subset of cities for each year, and the figure refers to applying the model to another subset. No city-year was used in both training and results. Also, there does not seem to be an issue for the model to perform well in 2022 when considering placebo treatments. Nonetheless, I present the results derived from training the network only on data from 2010 and 2014. The main patterns do not change.
 
-![alt text]([https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true](https://github.com/RafaelPintroSchmitt/neuralnet-counterfactuals/blob/main/outputs/2010_2014.pdf)https://github.com/RafaelPintroSchmitt/neuralnet-counterfactuals/blob/main/outputs/2010_2014.pdf)
+![alt text]([https://github.com/RafaelPintroSchmitt/neuralnet-counterfactuals/blob/main/outputs/2010_2014.pdf?raw=true])
