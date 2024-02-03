@@ -46,9 +46,7 @@ The first step is setting up the data structure which will be fed into the model
 
 The objective of the model is simple: given a sample of Brazilian cities' changes in PT vote share, it should predict the outcome for all other cities. If it learns to do so, we can hope that by inputting the control cities' information, the model will be able to predict the treated cities' outcomes. Note that the model learns a generic instruction: given any set of cities, predict the rest. But by learning to do so, it becomes well-suited for our objective, which is creating a counterfactual for the treated group. I split the sample into training and test sets. The model's parameters are obtained from one set of cities, and my results are derived by applying the model to a different set.
 
-Now I can explain the neural network's architecture - i.e. how it learns. I start with an overview for the reader unfamiliar with neural networks and then go into the specifics. At the first epoch (or training round), I feed the model with the 2010 network. Each layer of the network is basically a set of instructions to receive, transform and transmit the vector/matrix received from the previous layer. Then, the model applies an optimizer step, more precisely a variant of gradient descent called Adam. 
-
-Summarizing:
+I refer to the paper for the full explanation, but summarizing:
 
 - Architecture:
     1. A dropout layer (with varying dropout rates).
